@@ -1,24 +1,285 @@
-# README
+本記事では，GitとGitHubを用いてタスクをこなす一通りの流れ(Issue→PR→Review→Merge)に沿って，5GのGitHub運用ルールをGitHub初心者を対象に説明します．
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
 
-Things you may want to cover:
+# Git/GitHubとは
 
-* Ruby version
+ 「Git」は「ソースコードのバージョンを管理するツールの名称」であり，「GitHub」は「Gitを利用した開発者を支援するWebサービス」です．
+5GではGitとGitHubを用いて開発を行っています．
 
-* System dependencies
+Git/GitHubを用いるメリットとしては以下のようなものが挙げられます
+- バージョン管理が容易に行える
+- 共同開発が容易になる(誰が何を変更したかの履歴を管理できる)
 
-* Configuration
+ 以上のメリットにより，「Aさんが編集したプログラムを他のメンバーが確認し,レビューする」，「アプリケーションを〇カ月前の状態に戻す」などが可能となります．
 
-* Database creation
 
-* Database initialization
+### 参考
+[Gitを何故使うのか](https://qiita.com/forest1/items/401d28abdf1ee68c1f47)<br>
+[いまさら聞けないGitとGitHubの違いって何？](https://www.i3design.jp/in-pocket/3111)<br>
+[サル先生のGit-入門](https://backlog.com/ja/git-tutorial/intro/01/)<br>
 
-* How to run the test suite
+# Gitの基本
 
-* Services (job queues, cache servers, search engines, etc.)
+ Git/GitHubを用いて開発を行う際には，Gitの基礎的なことを理解しておく必要があります．
+ただし，Gitの基礎は既出の分かりやすい記事が多くある為，本記事では省略します．<br>
+ 特に，[サル先生のGit入門](https://backlog.com/ja/git-tutorial/)の入門編にある「Gitの基本」が分かりやすいと思いました．
+以下に，Gitを使う上での基礎的な用語を簡単にまとめました．
 
-* Deployment instructions
+- リポジトリ：ファイルやディレクトリの状態，変更履歴を記録しているもの
+- ローカルリポジトリ：ユーザ一人ひとりが利用するために、自分の手元のマシン上に配置するリポジトリ
+- リモートリポジトリ：専用のサーバに配置して複数人で共有するためのリポジトリ
+- ワークツリー：実際に作業をしているディレクトリ
+- コミット：ファイルやディレクトリの追加・変更を，リポジトリに記録する操作
+- インデックス：リポジトリにコミットする準備をするための場所
 
-* ...
+また，以下の画像に上記の用語の役割が分かるイメージ図を載せます．
+画像にある赤い文字がgitコマンドであり，タスクをこなす際には基本的に画像に載っている5つのコマンド(add,commit,push,pull,checkout)を使用することになります．
+<a id="addcommitpush"></a>
+![GIt_GitHub](https://user-images.githubusercontent.com/72865534/105118132-2c419800-5b11-11eb-8b75-064b0d922cff.jpg)
+
+# Git/GitHub用いて開発を行う流れ
+
+本章では，Git/GitHubを用いて開発を行っている現場に新しく入った初心者が，issueに取り掛かりPR，レビューを経てMergeするまでの流れに沿って，5GのGitHub運用ルールを説明します．
+
+## GitHubのアカウント作成
+
+まず初めにGitHubアカウントを作成し，作成したアカウントを5Gへ招待してもらいます．
+招待を受け無事参加できると，5Gのリポジトリのクローンが可能となります．<br>
+**※5GのリポジトリはPrivate設定となっているため，招待されたアカウントからでないとアクセスできません．**
+
+## ローカルリポジトリの作成
+
+Gitのインストールは完了し，Gitコマンドは使用できる前提で進めています．<br>
+
+ローカルリポジトリの作成方法は以下のように２種類あります．
+
+- 管理対象のファイルやフォルダをGitの新規リポジトリとして作成する(init)
+- リモートなどに既に作成してあるリポジトリをローカルに複製する(clone)
+
+![init_clone](https://user-images.githubusercontent.com/72865534/105258545-56f12680-5bcd-11eb-8829-2b52eaf8ac03.jpg)
+
+今回は開発現場へ途中参加したこと想定しているため，cloneコマンドを使用し，リモートリポジトリをローカルリポジトリへ複製します．
+```
+git clone [クローンしたいリポジトリURL] [クローン先のディレクトリ(省略可)]
+```
+例としてmikiwameをクローンする場合，画像のようにリモートリポジトリのURLを取得し，以下のようなコマンドを実行することでmikiwameフォルダが作成され，そのフォルダがローカルリポジトリとなります．
+![clone](https://user-images.githubusercontent.com/72865534/105260147-9bca8c80-5bd0-11eb-9884-0097df1bf2aa.png)
+```
+git clone https://github.com/team-5g/mikiwame.git
+```
+mikiwameの[開発環境の構築方法](https://github.com/team-5g/mikiwame#%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AE%E6%A7%8B%E7%AF%89%E6%96%B9%E6%B3%95)の初めに行っている作業が本節で行っている作業となります．
+### 参考
+
+[2.1 Git の基本 - Git リポジトリの取得](https://git-scm.com/book/ja/v2/Git-%E3%81%AE%E5%9F%BA%E6%9C%AC-Git-%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AE%E5%8F%96%E5%BE%97)
+
+## 作業に取り掛かるissueを確認する
+<a id="issue"></a>
+
+GitHubで自分がアサインされているissueを確認し，内容を把握します．この際以下の内容に当てはまる場合には宇野さんと連絡を取り，解消してから作業に取り掛かるのが良いと思われます．
+
+- タスクの優先度や納期が分からない(事前に宇野さんから教えて貰えていることが多いです)
+- タスクの意図が理解できない，解釈に自信が持てない(誤った解釈で作業に取り掛かると大惨事...)
+
+![issue](https://user-images.githubusercontent.com/72865534/105263883-d3870380-5bd3-11eb-8683-3d4410f038b8.png)
+<a id="issue2"></a>
+![issue_2](https://user-images.githubusercontent.com/72865534/106378671-f9898080-63e9-11eb-9022-5dd8be5f60ff.png)
+
+## ブランチの作成
+作業内容の把握が行えたら，そのissue専用の「ブランチ」を作成します．
+
+### ブランチとは
+
+ブランチとは作業履歴を枝分かれさせて記録していく機能であり，ブランチ上での変更は統合(マージ)されるまで他のブランチに影響しません．
+ブランチに関しても既出の分かりやすい記事が多くある為，本記事で詳細な説明は省略します．<br>
+ [サル先生のGit入門-発展編](https://backlog.com/ja/git-tutorial/stepup/01/)の「ブランチ」を一読することをお勧めします．
+
+### ブランチモデル
+
+ブランチモデルとはブランチをどのように切って(作成して)運用するかをまとめたものです．
+5Gでは以下の4種類のブランチを用いて運用しています．
+
+- master:リリースした時点のソースコードを管理するブランチ(**※触ってはいけない**)
+- dev(masterから派生 developの略):開発作業の主軸となるブランチ
+- feat(devから派生 featureの略):実装する機能ごとのブランチ
+- fix(devから派生):既存機能のバグ修正などを行う際のブランチ
+
+![ブランチモデル](https://user-images.githubusercontent.com/72865534/105275328-64fd7200-5be2-11eb-9152-42b9ec250a80.jpg)
+
+### 参考
+
+[いまさらだけどGitを基本から分かりやすくまとめてみた](https://qiita.com/gold-kou/items/7f6a3b46e2781b0dd4a0)<br>
+[Gitのブランチモデルについて](https://qiita.com/y-okudera/items/0b57830d2f56d1d51692)<br>
+[ぼくが実際に運用していたGitブランチモデルについて](https://havelog.ayumusato.com/develop/git/e513-git_branch_model.html)
+
+### 実際にブランチを作成する
+
+開発時に作成するブランチは全てdevブランチを元として(親として)作成します．
+しかし，ローカルにあるdevブランチは最新の状態とは限らない為(他のメンバーが開発を行いリモートのdevブランチを更新している可能性がある)新しくブランチを作成する前にローカルのdevブランチを最新の状態とする必要があります．
+
+(#以降はコメント)
+
+```
+git checkout dev #devブランチへ移動
+git pull origin dev #リモートリポジトリの最新情報をローカルリポジトリへ持ってくる
+```
+
+
+以下のコマンドにより新しいブランチを作成することができます．
+
+```
+git branch [作成するブランチ名] [親にするブランチ名] #ブランチの作成
+git checkout [作成したブランチ名] #作成したブランチへの移動
+```
+
+また，ブランチの切り替えで使用するcheckout コマンドに-bを付けることで，新規ブランチの作成と移動をまとめて行う事もできます．
+
+```
+git checkout -b [作成するブランチ名] [親にするブランチ名] #ブランチの作成とそのブランチへの移動
+```
+親にするブランチ名を指定しないと，直前までいたブランチが親となります．
+親ブランチを間違えてしまうとトラブルの元となるため，省略せずにdevと指定するのが良いと思われます．
+
+ブランチ名は全て小文字とし，新機能の追加であればfeat/，既存機能の修正であればfix/と頭に付けます．後ろにはその機能が直感で分かる名前を付けることが望ましいです．単語と単語は_を用いて区切ります．例えば，初めてのログイン時にポップアップを出す機能を追加する際には，以下のようにブランチを作成します．
+
+```
+git checkout -b feat/first_login_popup dev
+```
+
+ブランチの作成と移動が完了したら，実際にファイルを編集しプログラムを書いていきます．
+誤って想定外のブランチで作業を行ってしまうことが無いように，以下のコマンドによって現在どのブランチにいるのかを定期的に確認するのが良いと思います．
+
+```
+git branch #どのブランチにいるのか確認
+```
+
+### 参考
+[Gitでブランチの派生元を間違えたときの解決方法](https://www.granfairs.com/blog/staff/git-mistake-parent-branch)
+
+## add/commit/push
+
+作成したブランチで作業を行い，作業がひと段落した際にはadd，commit，pushを行い編集した履歴を記録します．add,commit,pushが行っている操作に関しては「Gitの基本」に載せた[画像](#addcommitpush)が分かりやすいと思います．
+
+```
+git add [編集したファイル名] #コミット対象のファイルをインデックスへ追加
+git commit -m "[このコミットに関するコメントを記載]" #ローカルリポジトリへ変更を保存
+git push origin [ブランチ名] #ローカルリポジトリの内容をリモートリポジトリへ反映させる
+
+例
+git add --all #変更があったすべてのファイルがインデックスへ追加される
+git commit -m "feat:初回ログイン時のポップアップ機能を追加"
+git push origin feat/first_login_popup
+```
+
+コミットを行うタイミングや，コミットメッセージの内容に関しては厳密なルールは設けられていませんが，後から分かりやすくなるように以下の記事などを参考にするのが良いと思われます．
+
+また，pushは作業日毎に一度は行うのが良いと思われます．
+
+[Git 作業における commit と push の頻度について](https://qiita.com/kozyty@github/items/87fa95a236b6142f7c10)<br>
+[【今日からできる】コミットメッセージに 「プレフィックス」 をつけるだけで、開発効率が上がった話](https://qiita.com/numanomanu/items/45dd285b286a1f7280ed)<br>
+[僕が考える最強のコミットメッセージの書き方](https://qiita.com/konatsu_p/items/dfe199ebe3a7d2010b3e)<br>
+
+## Pull Requestを作成する
+
+Pull Request(PR)とは，開発者のローカルリポジトリでの変更を他の開発者に通知する機能です．PRにより，機能追加や改修などの作業内容を他の開発者が確認することができます．
+詳細は[サル先生のGit入門-プルリクエスト編](https://backlog.com/ja/git-tutorial/pull-request/01/)などで確認することをお勧めします．
+
+作業用ブランチを作成し，初めてpushを行うとGitHub上で下記の画像のような黄色いメッセージが現れます．
+
+
+![PR_1_red](https://user-images.githubusercontent.com/72865534/106374939-f9c65380-63ca-11eb-8d09-dc4cca52ea69.png)
+
+「Compare & pull request」をクリックするとPRを作成する画面となるため，PR名を記入し，コメントにclose #([PRと対応するissue番号](#issue2)) を書き込んでPRを作成します．
+
+この際PR名には，進行途中や作業途中を表す「WIP」(work in progress)という文字を加え，まだ作業が完了していないことを示します．
+
+![PR_2_red](https://user-images.githubusercontent.com/72865534/106378090-1ec7c000-63e5-11eb-9614-b836876a7b7a.png)
+
+
+
+
+PRが作成でき，GitHubのステータスチェックをクリアしていると以下の画像のような画面になります．GitHubのステータスチェックとは，リポジトリで定められている条件をコミットが満たしているかのチャックでありこれを満たしていないとPRをマージすることができません．ステータスチェックの詳細は[GitHub Docs ステータスチェックについて](https://docs.github.com/ja/github/collaborating-with-issues-and-pull-requests/about-status-checks)で確認してください．何かしらの問題がある場合は，Detailsボタンで詳細を確認し，修正した後の再度commitしてください．
+
+また，誰がこのPRで作業を行っているかを分かりやすくするためにAssigneesボタンから自分のアカウントをアサインしてください．Reviewersボタンからレビュアーの追加も行えますが，こちらの追加は全ての作業が完了し，レビューを依頼する際に追加するのが良いと思われます．
+
+
+![PR_3_red](https://user-images.githubusercontent.com/72865534/106375697-a99ebf80-63d1-11eb-953d-b42d527b6f06.png)
+
+## コンフリクトが発生した場合
+
+変更内容をマージにより統合する際に、もし同じファイルの重複する部分が変更されていると、変更同士が衝突し「コンフリクト」と呼ばれる状態を引き起こします。
+コンフリクトを理解するには[サル先生のGit入門-プルリクエスト編-競合の発生](https://backlog.com/ja/git-tutorial/pull-request/09/)の画像を見るのが良いと思われます．<br>
+コンフリクトが発生するとPRのマージが行えず，行った作業をdevブランチへ反映させることができません．
+
+コンフリクトの解消は以下のページが分かりやすいと思いました．
+
+[Git コンフリクト解消手順](https://qiita.com/crarrry/items/c5964512e21e383b73da)<br>
+[git merge でのコンフリクト(競合)の解決方法まとめ](https://www-creators.com/archives/1938)
+
+コンフリクトを解消する手順を簡単に示すと，以下のようになると思われます．
+
+1. checkoutコマンドでdevブランチへ移動
+1. pullコマンドでdevブランチを最新にする
+1. checkoutコマンドで作業ブランチへ移動
+1. mergeコマンドでdevブランチを作業ブランチへ結合
+1. コンフリクトが発生しているメッセージが出力される
+1. statusコマンドでどのファイルがコンフリクトを起こしているか確認する
+1. 対象ファイルを確認し，コンフリクトを解消する
+1. add,commit,pushを行う
+
+
+## レビューを依頼する
+
+作業が完了し，pushを行い，デバッグが済み，ステータスチェックもクリアした際には，他の開発メンバーにレビューを依頼します．
+
+その際，PR名の[WIP]を消し，作業が完了したことを示します．加えて，PRのコメント欄で「このPRはどのような目的でどのような機能を追加したのか．デバッグはどのように行えば良いか」などを画像を交えつつ丁寧に説明し，レビュアーがレビューをしやすくなるように工夫します．[過去のPR](https://github.com/team-5g/mikiwame/pulls?q=is%3Apr+is%3Aclosed)を参考にするのが良いと思われます．<br>
+また，functionのデプロイやバッチ処理などが必要な場合には，その旨も記載しておくと良いと思われます．
+
+PR画面の右にあるReviewersボタンでレビュアーを追加し，slackの対象チャンネルにてレビューを依頼する旨とPRへのリンクを貼って，レビューを依頼します．
+
+## レビューを受け修正する
+
+レビュアーからのレビューを受け，必要であればコードの修正を行い再度commit，pushを行います．**レビューを受けての修正作業は優先度の高いタスクであるため，例外を除き最優先で取り掛かるのが良いと思われます．**
+
+## レビューを行う
+
+他のメンバーが作成したPRをレビューする際には，「動作確認」と「コードの確認」を行います．
+
+動作確認はnetlifyというツールを使用し，簡単に行う事ができます．
+![netlify_red](https://user-images.githubusercontent.com/72865534/106376753-837e1d00-63db-11eb-864d-a445fd5e36c9.png)
+
+ただし，一部機能ではnetlifyによるデバッグが難しいこともある為，その場合にはfetchコマンドによりPRされたブランチをローカルへ取ってくることで動作確認を行う事ができます．
+
+以下のコマンドでローカルにPRのブランチをfetchすることができます．
+
+```
+git fetch origin pull/(プルリクエストID)/head:(ブランチ名)
+```
+
+詳細は[GitHub Docs-プルリクエストをローカルでチェックアウトする](https://docs.github.com/ja/github/collaborating-with-issues-and-pull-requests/checking-out-pull-requests-locally)を確認してください．
+
+コードの確認はPRにある「Files changed」というボタンをクリックすることで確認することができます．
+
+![FilesChanged_red](https://user-images.githubusercontent.com/72865534/106377126-191aac00-63de-11eb-9b91-605ae07a684b.png)
+
+クリックすると，以下の画像のようにベースブランチ(dev)とPRのブランチとの比較を簡単に行うことができます．
+![コード確認_red](https://user-images.githubusercontent.com/72865534/106378296-ddd0ab00-63e6-11eb-81b9-77c9b28a8083.png)
+
+
+動作確認やコード確認で，問題や気になった点があった際には，コメントを付け意見を交換します．問題が見つからず，このままで良いと思った際には「LGTM」とコメントします．「LGTM」とは「Looks good to me」の略であり，「問題ないと思います」などという意味になります．
+
+## マージする
+<a id="merge"></a>
+
+全てのレビュアーからのレビューを受け，修正が完了したらPRをマージします．
+ただし，まだレビューが終わったいない場合や，コンフリクトの関係上別のPRを先にマージした方が良い場合なども考えられるため，宇野さんと相談しながら行うなど，マージの操作は慎重に行った方が良いと思われます．
+
+![merge](https://user-images.githubusercontent.com/72865534/106377519-e32af700-63e0-11eb-8080-e18251ca1f72.png)
+
+上述した[作業に取り掛かるissueを確認する](#issue)から本節の「マージする」までを繰り返すことで，Git/GitHubを用いたアプリケーション開発を進めていきます．
+
+
+# 最後に
+
+
+
+誤った説明や誤解を招く言い回しなどが多々あると思われますので，発見した際には適宜指摘・修正して頂けると幸いです．
