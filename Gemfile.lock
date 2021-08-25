@@ -60,6 +60,22 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
+    aws-eventstream (1.1.1)
+    aws-partitions (1.490.0)
+    aws-sdk-core (3.119.1)
+      aws-eventstream (~> 1, >= 1.0.2)
+      aws-partitions (~> 1, >= 1.239.0)
+      aws-sigv4 (~> 1.1)
+      jmespath (~> 1.0)
+    aws-sdk-kms (1.46.0)
+      aws-sdk-core (~> 3, >= 3.119.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-s3 (1.99.0)
+      aws-sdk-core (~> 3, >= 3.119.0)
+      aws-sdk-kms (~> 1)
+      aws-sigv4 (~> 1.1)
+    aws-sigv4 (1.2.4)
+      aws-eventstream (~> 1, >= 1.0.2)
     bootsnap (1.7.7)
       msgpack (~> 1.0)
     builder (3.2.4)
@@ -73,6 +89,7 @@ GEM
       activesupport (>= 5.0)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
+    jmespath (1.4.0)
     listen (3.6.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -83,6 +100,7 @@ GEM
       mini_mime (>= 0.1.1)
     marcel (1.0.1)
     method_source (1.0.0)
+    mini_magick (4.11.0)
     mini_mime (1.1.0)
     minitest (5.14.4)
     msgpack (1.4.2)
@@ -148,10 +166,12 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  aws-sdk-s3
   bootsnap (>= 1.4.4)
   byebug
   foreman
   listen (~> 3.3)
+  mini_magick
   pg (~> 1.1)
   puma (~> 5.0)
   rack-cors
