@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   def index
-    render json: Post.all, methods: [:image_url]  # ここを変更
+    render json: Post.all# , methods: [:image_url]  ここを変更
   end
 
   def create
