@@ -3,6 +3,11 @@ class PostsController < ApplicationController
     render json: Post.all, methods: [:image_url] # ここを変更
   end
 
+  def show
+    post = Post.find(params[:id])
+    render json: post, methods: [:image_url]
+  end
+
   def create
     post = Post.new(post_params)
     if post.save
