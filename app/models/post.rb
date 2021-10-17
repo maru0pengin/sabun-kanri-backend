@@ -5,6 +5,6 @@ class Post < ApplicationRecord
 
   def image_url
     # 紐づいている画像のURLを取得する
-    image.attached? ? url_for(image) : nil
+    return image.attached? ? url_for(image) : nil
   end
 end
